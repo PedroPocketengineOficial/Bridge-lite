@@ -1,0 +1,33 @@
+(()=>{'use strict';
+const $=id=>document.getElementById(id), DB='bridge-lite-db', STORE='state';
+let files={},active=null,project='Meu Addon',dirty=false,saveTimer=null;
+const starter=()=>({'manifest.json':JSON.stringify({format_version:2,header:{name:'Meu Addon',description:'Criado com Bridge Lite',uuid:crypto.randomUUID(),version:[1,0,0],min_engine_version:[1,26,0]},modules:[{type:'data',uuid:crypto.randomUUID(),version:[1,0,0]}]},null,2)});
+function toast(s){let t=$('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2100)}
+function dbOpen(){return new Promise((res,rej)=>{let r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function persist(){try{let db=await dbOpen();db.transaction(STORE,'readwrite').objectStore(STORE).put({files,project},'workspace');$('fileStatus').textContent='Salvo';dirty=false}catch(e){$('fileStatus').textContent='Não foi possível salvar'}}
+function scheduleSave(){dirty=true;$('fileStatus').textContent='Editando…';clearTimeout(saveTimer);saveTimer=setTimeout(persist,450)}
+async function restore(){try{let db=await dbOpen(),v=await new Promise(r=>{let q=db.transaction(STORE).objectStore(STORE).get('workspace');q.onsuccess=()=>r(q.result)});if(v){files=v.files||{};project=v.project||project}}catch(e){}if(!Object.keys(files).length)files=starter();$('projectName').textContent=project;renderTree()}
+function ext(path){return path.split('.').pop().toLowerCase()}
+function icon(path){let e=ext(path);return e==='json'?'{}':e==='js'||e==='ts'?'JS':e==='mcfunction'?'ƒ':e==='lang'?'文':'·'}
+function renderTree(){let root=$('fileTree');root.innerHTML='';Object.keys(files).sort().forEach(path=>{let d=document.createElement('div');d.className='treeitem'+(active===path?' active':'');d.innerHTML=`<span class="ficon">${icon(path)}</span><span class="fname"></span>`;d.querySelector('.fname').textContent=path;d.onclick=()=>openFile(path);root.append(d)});renderTabs()}
+function renderTabs(){let t=$('tabs');t.innerHTML='';if(!active){t.innerHTML='<div class="emptytab">Nenhum arquivo aberto</div>';return}let d=document.createElement('div');d.className='tab active';let s=document.createElement('span');s.textContent=active;let b=document.createElement('button');b.textContent='×';b.onclick=()=>{active=null;$('editorPanel').hidden=true;$('welcome').hidden=false;renderTree()};d.append(s,b);t.append(d)}
+function openFile(path){if(!(path in files))return;active=path;$('welcome').hidden=true;$('editorPanel').hidden=false;$('editor').value=files[path];$('filePath').textContent=path;$('languageLabel').textContent=ext(path).toUpperCase();$('validation').textContent='Pronto';$('fileStatus').textContent='Salvo';renderTree();if(innerWidth<=700)$('sidebar').classList.remove('open')}
+$('editor').addEventListener('input',()=>{if(!active)return;files[active]=$('editor').value;scheduleSave();if(ext(active)==='json')validateJSON()});
+$('editor').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();let a=e.target.selectionStart,b=e.target.selectionEnd,v=e.target.value;e.target.value=v.slice(0,a)+'  '+v.slice(b);e.target.selectionStart=e.target.selectionEnd=a+2;e.target.dispatchEvent(new Event('input'))}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();persist()}});
+function validateJSON(){try{JSON.parse($('editor').value);$('validation').textContent='JSON válido'}catch(e){$('validation').textContent='JSON: '+e.message.slice(0,85)}}
+$('formatBtn').onclick=()=>{try{$('editor').value=JSON.stringify(JSON.parse($('editor').value),null,2);$('editor').dispatchEvent(new Event('input'));toast('JSON formatado')}catch(e){toast('Corrija o JSON antes de formatar')}};
+$('editor').addEventListener('keyup',()=>{let t=$('editor'),p=t.selectionStart,s=t.value.slice(0,p).split('\n');$('cursorLabel').textContent=`Ln ${s.length}, Col ${s.at(-1).length+1}`});
+function showName(title,placeholder,callback){$('dialogTitle').textContent=title;$('nameInput').value=placeholder||'';$('nameDialog').showModal();$('confirmName').onclick=e=>{e.preventDefault();let n=$('nameInput').value.trim().replace(/^\/+|\/+$/g,'');if(!n)return;if(callback(n))$('nameDialog').close()};}
+$('newFileBtn').onclick=$('createProjectBtn').onclick=()=>showName('Novo arquivo','manifest.json',n=>{if(files[n]!==undefined){toast('Esse arquivo já existe');return false}files[n]='';openFile(n);scheduleSave();return true});
+$('newFolderBtn').onclick=()=>showName('Criar arquivo em uma pasta','entities/example.json',n=>{if(!n.includes('/')){toast('Use pasta/arquivo.ext');return false}if(files[n]!==undefined)return false;files[n]='';openFile(n);scheduleSave();return true});
+$('menuBtn').onclick=()=>$('sidebar').classList.toggle('open');
+$('openBtn').onclick=()=>showImportChoice();$('importWelcomeBtn').onclick=showImportChoice;
+function showImportChoice(){let useFolder=confirm('Importar uma pasta inteira?\\nOK = selecionar pasta | Cancelar = selecionar arquivos');(useFolder?$('folderInput'):$('fileInput')).click()}
+async function importFiles(list){if(!list.length)return;for(let f of list){let path=f.webkitRelativePath||f.name;path=path.replace(/^[^/]+\//,'');if(f.name.endsWith('.mcaddon')||f.name.endsWith('.mcpack')){toast('Pacotes .mcaddon/.mcpack: extraia o ZIP antes de importar');continue}files[path]=await f.text()}project='Projeto importado';$('projectName').textContent=project;renderTree();let first=Object.keys(files)[0];if(first)openFile(first);scheduleSave();toast(`${list.length} arquivo(s) importado(s)`)}
+$('fileInput').onchange=e=>importFiles([...e.target.files]);$('folderInput').onchange=e=>importFiles([...e.target.files]);
+$('saveBtn').onclick=()=>{persist();toast('Projeto salvo neste dispositivo')};
+$('exportBtn').onclick=async()=>{if(!window.JSZip){toast('Biblioteca ZIP não carregou. Verifique a internet.');return}let zip=new JSZip();for(let [p,c] of Object.entries(files))zip.file(p,c);let blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:4}});let a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download='bridge-lite-project.zip';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);toast('ZIP exportado')};
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+restore().then(()=>{if(Object.keys(files).length===1&&files['manifest.json']!==undefined)openFile('manifest.json')});
+})();
