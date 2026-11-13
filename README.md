@@ -1,34 +1,27 @@
-# Bridge Lite
+# Bridge Lite — Web Edition
 
-Versão web leve experimental para edição básica de projetos Minecraft Bedrock.
+Reimplementação web independente, mobile-first, para edição de projetos de Minecraft Bedrock.
 
 ## Publicar no GitHub Pages
-1. Crie um repositório no GitHub.
-2. Envie **todos os arquivos desta pasta** para a raiz do repositório.
+1. Extraia este ZIP.
+2. Envie `index.html`, `app.js`, `styles.css`, `manifest.webmanifest` e `sw.js` para a raiz de um repositório.
 3. Abra **Settings → Pages**.
-4. Em Build and deployment, escolha **Deploy from a branch**.
-5. Selecione `main` e `/ (root)` e salve.
-6. Aguarde a publicação e abra o endereço fornecido pelo GitHub.
+4. Em **Build and deployment**, escolha **Deploy from a branch**, branch `main`, pasta `/ (root)`.
 
-O projeto usa caminhos relativos, então funciona em repositórios GitHub Pages com endereço `/nome-do-repositorio/`.
-
-## Recursos implementados
+## Recursos desta versão
 - Interface responsiva para celular e desktop.
-- Arquivos JSON, JS, TS, MCFunction e texto.
-- Importação de arquivos ou diretórios via seletor do navegador.
-- Criação de arquivos e caminhos de pasta.
-- Salvamento automático local via IndexedDB.
-- Validação e formatação básica de JSON.
-- Exportação do projeto como ZIP.
-- PWA e cache dos arquivos principais.
+- Criar projeto com `manifest.json`.
+- Explorador de arquivos e pastas.
+- Editor de texto com suporte a JSON, JavaScript e MCFunction.
+- Validação e formatação JSON.
+- Importação de `.zip`, `.mcpack`, `.mcaddon` e `.mcworld` (um pacote por vez), além de arquivos individuais.
+- Exportação ZIP.
+- Salvamento automático no armazenamento local do navegador.
+- Indicador de progresso para importação, exportação e compactação.
+- PWA e cache offline da interface.
 
-## Limitações importantes
-Esta é uma base Lite independente, não uma conversão completa do Bridge 1.8.5. Ainda não inclui Monaco/IntelliSense, autocomplete de componentes Bedrock, plugins do Bridge, integração direta com a pasta `com.mojang`, visualizador avançado de entidades, nem importação automática de `.mcaddon`/`.mcpack`. Navegadores móveis não permitem acesso irrestrito ao sistema de arquivos; a importação/exportação ocorre pelos seletores e downloads do navegador.
+## Limitações honestas
+Esta é uma base funcional de reimplementação, não paridade completa com Bridge v2. Não possui ainda IntelliSense Bedrock, árvore JSON visual, editor de entidades/ícones/animações, plugins do Bridge, leitura direta da pasta `com.mojang`, sincronização com Minecraft ou suporte a todos os formatos binários. Os módulos ZIP são carregados sob demanda via jsDelivr na primeira importação/exportação ZIP; a edição de texto funciona sem esse módulo.
 
-A biblioteca JSZip é carregada por CDN para reduzir o tamanho inicial do app. A primeira exportação ZIP requer conexão. O restante da interface pode ser armazenado em cache pelo PWA após a primeira visita.
-
-## Privacidade
-Os arquivos ficam no armazenamento local do navegador deste dispositivo. Não há servidor de upload implementado. Limpar os dados do site/navegador pode apagar projetos locais; exporte cópias ZIP regularmente.
-
-## Nota sobre o código-fonte de referência
-O ZIP fornecido foi analisado como referência de arquitetura e recursos. Esta implementação Lite é uma base web separada e não incorpora o código original do Bridge.
+## Licença e origem
+Projeto independente, sem reutilização do código-fonte do Bridge. O Bridge original é um projeto separado; esta interface não é oficial nem afiliada ao Bridge Core.

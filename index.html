@@ -1,47 +1,12 @@
 <!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#17191f"><meta name="description" content="Bridge Lite — editor leve para addons Minecraft Bedrock.">
-<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg">
-<title>Bridge Lite</title><link rel="stylesheet" href="./style.css">
-</head>
-<body>
-<header class="topbar">
-  <button id="menuBtn" class="iconbtn" aria-label="Abrir arquivos">☰</button>
-  <div class="brand"><span class="brandmark">B</span><span>bridge <b>lite</b></span></div>
-  <div class="projectname" id="projectName">Projeto sem nome</div>
-  <div class="top-actions">
-    <button id="openBtn" class="btn subtle">Abrir</button><button id="saveBtn" class="btn subtle">Salvar</button>
-    <button id="exportBtn" class="btn primary">Exportar ZIP</button>
-    <input id="fileInput" type="file" multiple hidden>
-    <input id="folderInput" type="file" webkitdirectory multiple hidden>
-  </div>
-</header>
-<div class="workspace">
- <aside class="sidebar" id="sidebar">
-  <div class="sidehead"><span>EXPLORADOR</span><div><button id="newFileBtn" title="Novo arquivo">＋</button><button id="newFolderBtn" title="Nova pasta">▱</button></div></div>
-  <div id="fileTree" class="filetree"></div>
-  <div class="sidefoot"><span class="dot"></span> Armazenamento local</div>
- </aside>
- <main class="main">
-  <div class="tabs" id="tabs"><div class="emptytab">Nenhum arquivo aberto</div></div>
-  <section class="editor-wrap">
-   <div class="welcome" id="welcome">
-    <div class="welcome-logo">B</div><h1>Bridge <span>Lite</span></h1>
-    <p>Um espaço leve para criar addons do Minecraft Bedrock.</p>
-    <div class="welcome-actions"><button class="btn primary" id="createProjectBtn">＋ Criar arquivo</button><button class="btn subtle" id="importWelcomeBtn">Importar projeto</button></div>
-    <div class="quickgrid"><div><b>JSON</b><small>Behavior e Resource Packs</small></div><div><b>JavaScript</b><small>Script API</small></div><div><b>MCFunction</b><small>Comandos e funções</small></div></div>
-   </div>
-   <div id="editorPanel" class="editor-panel" hidden>
-    <div class="editor-toolbar"><span id="filePath"></span><span id="fileStatus">Salvo</span><button id="formatBtn" class="mini">Formatar JSON</button></div>
-    <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Editor de código"></textarea>
-    <div class="statusbar"><span id="languageLabel">TEXTO</span><span id="cursorLabel">Ln 1, Col 1</span><span id="validation">Pronto</span></div>
-   </div>
-  </section>
- </main>
-</div>
-<div id="toast" role="status"></div>
-<dialog id="nameDialog"><form method="dialog"><h3 id="dialogTitle">Novo arquivo</h3><label for="nameInput">Nome</label><input id="nameInput" placeholder="ex: manifest.json" required><div class="dialog-actions"><button class="btn subtle" value="cancel">Cancelar</button><button id="confirmName" class="btn primary" value="ok">Criar</button></div></form></dialog>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="./app.js"></script>
-</body></html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#171a21"><meta name="description" content="Editor leve de Add-ons Minecraft Bedrock"><link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css"><title>Bridge Lite</title></head>
+<body><div id="app">
+<header class="top"><button class="brand" id="homeBtn"><span class="logo">B</span><span>bridge<span class="lite"> lite</span><small>BEDROCK ADD-ON STUDIO</small></span></button><div class="top-actions"><span id="saveState" class="save">● Salvo</span><button class="iconbtn" id="themeBtn" title="Alternar tema">◐</button><button class="primary" id="exportBtn">Exportar ZIP</button></div></header>
+<div class="toolbar"><button id="newProject">＋ Projeto</button><button id="importBtn">⇧ Importar</button><button id="newFile">＋ Arquivo</button><button id="newFolder">＋ Pasta</button><span class="toolbar-spacer"></span><span id="projectLabel">Nenhum projeto aberto</span></div>
+<main class="layout"><aside class="sidebar"><div class="side-head"><span>EXPLORADOR</span><button id="refreshBtn" title="Atualizar">↻</button></div><div id="projectTree" class="tree empty">Crie ou importe um projeto para começar.</div><div class="side-foot"><button id="settingsBtn">⚙ Configurações</button><button id="aboutBtn">ⓘ Sobre</button></div></aside>
+<section class="work"><div class="tabs" id="tabs"><div class="welcome-tab">Bem-vindo</div></div><div id="welcome" class="welcome"><div class="hero-logo">B</div><h1>Seu estúdio Bedrock, mais leve.</h1><p>Crie e edite Behavior Packs e Resource Packs direto no navegador.</p><div class="quick"><button class="primary" id="welcomeNew">Criar projeto</button><button id="welcomeImport">Importar projeto</button></div><div class="features"><div><b>⚡ Leve</b><span>Interface otimizada para celulares</span></div><div><b>📦 Packs</b><span>Importe e exporte arquivos ZIP</span></div><div><b>✓ JSON</b><span>Validação e formatação rápida</span></div></div></div><div id="editorWrap" class="editor-wrap hidden"><div class="editor-head"><div><b id="fileName">arquivo</b><span id="filePath"></span></div><div class="editor-actions"><button id="formatBtn">Formatar JSON</button><button id="validateBtn">Validar</button><button id="closeFile">✕</button></div></div><div id="statusLine" class="statusline">Pronto</div><textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Editor de código"></textarea></div></section></main>
+<footer><span>Bridge Lite <b>Web Edition</b></span><span id="footerStatus">Pronto para trabalhar</span></footer></div>
+<div id="progress" class="progress hidden"><div class="progress-card"><div class="progress-title"><span id="progressTitle">Carregando...</span><b id="progressPct">0%</b></div><div class="track"><div id="progressBar"></div></div><p id="progressDetail">Preparando operação...</p></div></div>
+<div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-head"><b id="modalTitle">Novo projeto</b><button id="modalClose">✕</button></div><div id="modalBody"></div><div class="modal-actions"><button id="modalCancel">Cancelar</button><button class="primary" id="modalOk">Continuar</button></div></div></div>
+<input id="fileInput" type="file" multiple hidden accept=".zip,.mcpack,.mcaddon,.mcworld,.json,.js,.mcfunction,.txt,.lang,.png,.jpg,.jpeg,.ogg,.wav,.tga,.geo.json">
+<script src="./app.js" defer></script></body></html>
